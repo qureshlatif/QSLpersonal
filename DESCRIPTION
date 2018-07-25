@@ -7,4 +7,6 @@ Author: Quresh S. Latif
 Maintainer: Nobody's fault but mine <qureshlatif@yahoo.com>
 Description: Contains datasets and functions used regularly by Quresh S. Latif
 Suggests: PresenceAbsence
+Depends: dplyr, stringr
+Imports: dplyr, stringr
 License: GPL-2
