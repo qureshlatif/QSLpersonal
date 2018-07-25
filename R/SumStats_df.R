@@ -1,11 +1,11 @@
-SumStats_df <- function(data, vars = names(vars), binary = c()) {
+SumStats_df <- function(data, vars = names(data), binary = c()) {
   rows <- vars
   cols <- c("Mean (SD, range)", "n")
   out <- matrix("", nrow = length(rows), ncol  = length(cols),
                 dimnames = list(rows, cols))
   
   ifelse(length(binary) > 0, rows1 <- rows[-binary], rows1 <- rows)
-  for(r in which(rows %in% rows1) {
+  for(r in which(rows %in% rows1)) {
     vec <- data %>% pull(rows[r])
     out[rows[r], "Mean (SD, range)"] <- vec %>% mean(na.rm = T) %>% round(digits = 2) %>%
       str_c(" (", vec %>% sd(na.rm = T) %>% round(digits = 2), ", ",
