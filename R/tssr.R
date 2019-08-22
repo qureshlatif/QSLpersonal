@@ -10,6 +10,6 @@ tssr <- function(lat,long,dateTime) {
   date <- substr(dateTime, 1, 10)
   srt <- getSunlightTimes(date=as.Date(date,tz=tz),lat=lat,lon=long,keep='sunrise',tz=tz)$sunrise
   
-  tssr <- difftime(srt,as.POSIXlt(time.i,tz=tz),units = 'mins')
+  tssr <- as.numeric(difftime(as.POSIXlt(dateTime,tz=tz), srt, units = 'mins'))
   return(tssr=tssr)
 }

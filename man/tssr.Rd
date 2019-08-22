@@ -3,7 +3,7 @@
 \title{Calculate time since sunrise.}
 \description{Looks up sunrise for a given latitude, longditude, and date, and then converts 24-hr time to time since sunrise in minutes.}
 \usage{
-tssr(lat,long,time)
+tssr(lat,long,dateTime)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
