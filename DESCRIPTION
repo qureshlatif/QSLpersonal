@@ -7,6 +7,6 @@ Author: Quresh S. Latif
 Maintainer: Nobody's fault but mine <qureshlatif@yahoo.com>
 Description: Contains datasets and functions used regularly by Quresh S. Latif
 Suggests: PresenceAbsence
-Depends: dplyr, stringr, suncalc, lutz, sf
-Imports: dplyr, stringr, suncalc, lutz, sf
+Depends: dplyr, stringr, suncalc, lutz, sf, units
+Imports: dplyr, stringr, suncalc, lutz, sf, units
 License: GPL-2
