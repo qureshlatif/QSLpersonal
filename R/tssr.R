@@ -1,4 +1,4 @@
-function (lat, long, dateTime) {
+tssr <- function (lat, long, dateTime) {
   require(suncalc)
   require(lutz)
   require(sf)
