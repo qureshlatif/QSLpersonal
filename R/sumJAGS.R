@@ -31,6 +31,8 @@ sumJAGS <- function(rawJAGS) {
     p.750 <- apply(p.ests, 2:length(dim(p.ests)), function(x) quantile(x, prob = 0.75, type = 8))
     p.975 <- apply(p.ests, 2:length(dim(p.ests)), function(x) quantile(x, prob = 0.975, type = 8))
     p.est.dims.chr <- rows[which(str_sub(rows, 1, nchar(p)) == p)]
+    if(any(!str_detect(p.est.dims.chr, "\\[")))
+      p.est.dims.chr <- p.est.dims.chr[-which(!str_detect(p.est.dims.chr, "\\["))]
     p.est.dims.int <- str_split(p.est.dims.chr, "\\[", simplify = T)[,2]
     p.est.dims.int <- str_split(p.est.dims.int, "\\]", simplify = T)[,1]
     if(any(str_detect(p.est.dims.int, ","))) {
