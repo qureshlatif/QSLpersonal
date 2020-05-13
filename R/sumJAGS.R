@@ -5,17 +5,18 @@ sumJAGS <- function(rawJAGS, chunk.length = 50) {
   npars <- dim(rawJAGS$AA)[2]
   if(npars <= chunk.length) {
     Rhat <- gelman.diag(rawJAGS)$psrf[, 2]
+    neff <- effectiveSize(rawJAGS)
   } else { # Avoids "Error in chol.default(W) :" with large models
-    Rhat <- c()
+    Rhat <- neff <- c()
     nchunks <- ceiling(npars / chunk.length)
     for(chnk in 1:nchunks) {
       st <- (chnk*chunk.length) - chunk.length + 1
       end <- ifelse(chnk == nchunks, npars, chnk*chunk.length)
-      Rhat <- c(Rhat, gelman.diag(mod.raw[, st:end])$psrf[, 2])
+      Rhat <- c(Rhat, gelman.diag(rawJAGS[, st:end])$psrf[, 2])
+      neff <- c(neff, effectiveSize(rawJAGS[, st:end]))
     }
   }
-
-  neff <- effectiveSize(rawJAGS)
+  
   sims.list <- simsList(rawJAGS)
   cols <- c("mean", "SD", "q025", "q250", "q500", "q750", "q975", "Rhat", "neff")
   rows <- names(Rhat)
@@ -45,6 +46,8 @@ sumJAGS <- function(rawJAGS, chunk.length = 50) {
     p.est.dims.chr <- rows[which(str_sub(rows, 1, nchar(p)) == p)]
     if(any(!str_detect(p.est.dims.chr, "\\[")))
       p.est.dims.chr <- p.est.dims.chr[-which(!str_detect(p.est.dims.chr, "\\["))]
+    if(any(str_sub(p.est.dims.chr, 1, nchar(p) + 1) != str_c(p, "[")))
+      p.est.dims.chr <- p.est.dims.chr[-which(str_sub(p.est.dims.chr, 1, nchar(p) + 1) != str_c(p, "["))]
     p.est.dims.int <- str_split(p.est.dims.chr, "\\[", simplify = T)[,2]
     p.est.dims.int <- str_split(p.est.dims.int, "\\]", simplify = T)[,1]
     if(any(str_detect(p.est.dims.int, ","))) {
