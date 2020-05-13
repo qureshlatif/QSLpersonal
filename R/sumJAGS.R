@@ -1,8 +1,20 @@
-sumJAGS <- function(rawJAGS) {
+sumJAGS <- function(rawJAGS, chunk.length = 50) {
   require(coda)
   require(stringr)
   
-  Rhat <- gelman.diag(rawJAGS)$psrf[, 2]
+  npars <- dim(rawJAGS$AA)[2]
+  if(npars <= chunk.length) {
+    Rhat <- gelman.diag(rawJAGS)$psrf[, 2]
+  } else { # Avoids "Error in chol.default(W) :" with large models
+    Rhat <- c()
+    nchunks <- ceiling(npars / chunk.length)
+    for(chnk in 1:nchunks) {
+      st <- (chnk*chunk.length) - chunk.length + 1
+      end <- ifelse(chnk == nchunks, npars, chnk*chunk.length)
+      Rhat <- c(Rhat, gelman.diag(mod.raw[, st:end])$psrf[, 2])
+    }
+  }
+
   neff <- effectiveSize(rawJAGS)
   sims.list <- simsList(rawJAGS)
   cols <- c("mean", "SD", "q025", "q250", "q500", "q750", "q975", "Rhat", "neff")
