@@ -1,6 +1,7 @@
 sumJAGS <- function(rawJAGS, chunk.length = 50) {
   require(coda)
   require(stringr)
+  require(testit)
   
   npars <- dim(rawJAGS$AA)[2]
   if(npars <= chunk.length) {
@@ -12,7 +13,11 @@ sumJAGS <- function(rawJAGS, chunk.length = 50) {
     for(chnk in 1:nchunks) {
       st <- (chnk*chunk.length) - chunk.length + 1
       end <- ifelse(chnk == nchunks, npars, chnk*chunk.length)
-      Rhat <- c(Rhat, gelman.diag(rawJAGS[, st:end])$psrf[, 2])
+      if(has_error(gelman.diag(rawJAGS[, st:end]), silent = T)) {
+        for(i in 1:st:end) Rhat <- c(Rhat, gelman.diag(rawJAGS[, i])$psrf[, 2])
+      } else {
+        Rhat <- c(Rhat, gelman.diag(rawJAGS[, st:end])$psrf[, 2])
+      }
       neff <- c(neff, effectiveSize(rawJAGS[, st:end]))
     }
   }
