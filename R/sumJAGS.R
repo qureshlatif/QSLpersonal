@@ -14,7 +14,7 @@ sumJAGS <- function(rawJAGS, chunk.length = 50) {
       st <- (chnk*chunk.length) - chunk.length + 1
       end <- ifelse(chnk == nchunks, npars, chnk*chunk.length)
       if(has_error(gelman.diag(rawJAGS[, st:end]), silent = T)) {
-        for(i in 1:st:end) Rhat <- c(Rhat, gelman.diag(rawJAGS[, i])$psrf[, 2])
+        for(i in st:end) Rhat <- c(Rhat, gelman.diag(rawJAGS[, i])$psrf[, 2])
       } else {
         Rhat <- c(Rhat, gelman.diag(rawJAGS[, st:end])$psrf[, 2])
       }
