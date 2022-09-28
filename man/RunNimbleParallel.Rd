@@ -26,6 +26,7 @@
   \item{mod.nam}{Character string used as a file label for saved model outputs.}
   \item{max.samples.saved}{Integer that sets minimum level of samples to save per MCMC chain in final model object. Additional thinning of posterior samples (i.e., after samples are recovered from processing clusters) is implemented as necessary to limit the size of the model object to (roughly) this level. Default = 10000.}
   \item{rtrn.model}{Logical indicating whether to return model output to R environment. Default = F, i.e., model output is only saved to disk.}
+  \item{sav.model}{Logical indicating whether to save model output to disk. Default = T, i.e., model output is saved to disk.}
   \item{Rht.required}{Maximum numeric value for Rhat for any parameter required to end sampling.}
   \item{neff.required}{Minimum value for n_effective for any parameter required to end sampling.}
 }

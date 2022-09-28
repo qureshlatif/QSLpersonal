@@ -1,8 +1,10 @@
 RunNimbleParallel <-
   function(model, inits, data, constants, parameters,
            nc = 2, ni = 2000, nb = 0.5, nt = 10, mod.nam = "mod",
-           max.samples.saved = 10000, rtrn.model = F,
+           max.samples.saved = 10000, rtrn.model = F, sav.model = T,
            Rht.required = 1.1, neff.required = 100) {
+    if((ni * nb) < 100) stop("Increase iterations (ni). Too few samples for calculating Rhat.")
+    
     #~~~~~Parallel processing code (probably won't work in Windows)~~~~~#
     require(nimble)
     require(parallel)
@@ -56,7 +58,7 @@ RunNimbleParallel <-
     mn.neff <- sumTab %>% slice(ind.Rht) %>% pull(n.eff) %>% min(na.rm = T)
 
     mod <- list(mcmcOutput = mod, summary = sumTab)
-    R.utils::saveObject(mod, mod.nam) # If running all in one.
+    if(sav.model) R.utils::saveObject(mod, mod.nam) # If running all in one.
     
     ## If has not converged, continue sampling
     if(round(mxRht, digits = 1) > Rht.required | mn.neff < neff.required) {
@@ -96,7 +98,7 @@ RunNimbleParallel <-
         }
       }
       
-      # Discard first half of samples as burn-in
+      # Discard specified proportion of initial samples as burn-in
       out3 <- out1
       ni.saved <- nrow(out3[[1]])
       for(chn in 1:nc) {
@@ -114,7 +116,7 @@ RunNimbleParallel <-
       gc(verbose = F)
       
       mod <- list(mcmcOutput = mod, summary = sumTab)
-      R.utils::saveObject(mod, mod.nam) # If running all in one.
+      if(sav.model) R.utils::saveObject(mod, mod.nam) # If running all in one.
     }
     for(r in 1:n.runs) file.remove(str_c(mod.nam, "_chunk", r))
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
