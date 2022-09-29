@@ -9,7 +9,7 @@
   ***Note: This function will probably not run in Windows because parallel processing packages do not operate easily in a Windows environment.
 }
 \usage{
-  RunNimbleParallel(model, inits, data, constants, parameters,
+  RunNimbleParallel(model, inits, data, constants, parameters, par.ignore.Rht = c(),
            nc = 2, ni = 2000, nb = 0.5, nt = 10, mod.nam = "mod",
            max.samples.saved = 10000, rtrn.model = F,
            Rht.required = 1.1, neff.required = 100)
@@ -19,6 +19,8 @@
   \item{inits}{Function that generates initial values for stochastic nodes as required to run a NIMBLE model.}
   \item{data}{List containing all data objects required to fit specified NIMBLE model.}
   \item{constants}{List containing all constants required to fit specified NIMBLE model.}
+  \item{parameters}{String vector containing names of all parameters for which estimates are to be stored by the sampler.}
+  \item{par.ignore.Rht}{String vector listing parameters to be ignored when calculating convergence and sampling metrics. All parameters with names containing strings listed here will be ignored. Default is an empty vector, whereby all parameters will be considered for calculating Rhat.}
   \item{nc}{Number of MCMC chains to run. Note available cores must equal or exceed 'nc'. Default = 2.}
   \item{ni}{Number of iterations to run MCMC chains before checking convergence and sampling metrics. Default = 10000. If model does not meet specified levels for R_hat and n_effective, sampling will continue for another 'ni' steps before checking metrics again.}
   \item{nb}{Proportion of MCMC chains to discard as burn-in.}

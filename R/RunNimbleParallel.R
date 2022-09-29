@@ -1,5 +1,5 @@
 RunNimbleParallel <-
-  function(model, inits, data, constants, parameters,
+  function(model, inits, data, constants, parameters, par.ignore.Rht = c(),
            nc = 2, ni = 2000, nb = 0.5, nt = 10, mod.nam = "mod",
            max.samples.saved = 10000, rtrn.model = F, sav.model = T,
            Rht.required = 1.1, neff.required = 100) {
@@ -33,6 +33,12 @@ RunNimbleParallel <-
       CmodelMCMC$run(ni, reset = FALSE)
       return(as.mcmc(as.matrix(CmodelMCMC$mvSamples)))
     })
+    for(chn in 1:nc) { # nc must be > 1
+      ind.keep <- c()
+      for(p in 1:length(parameters)) ind.keep <-
+          c(ind.keep, which(str_detect(dimnames(out1[[chn]])[[2]], parameters[p]))) %>% unique()
+      out1[[chn]] <- out1[[chn]][,ind.keep]
+    }
     
     ## Check convergence ##
     out2 <- out1
@@ -49,14 +55,18 @@ RunNimbleParallel <-
       mutate(Parameter = row.names(sumTab)) %>%
       select(Parameter, mean:f)
     
-    ind.Rht <- which(!str_detect(sumTab$Parameter, "test.n") &
-                       !str_detect(sumTab$Parameter, "M.save") &
-                       !str_detect(sumTab$Parameter, "pXtheta") &
-                       !str_detect(sumTab$Parameter, "Ind") &
-                       !str_detect(sumTab$Parameter, "ind"))
-    mxRht <- sumTab %>% slice(ind.Rht) %>% pull(Rhat) %>% max(na.rm = T)
-    mn.neff <- sumTab %>% slice(ind.Rht) %>% pull(n.eff) %>% min(na.rm = T)
-
+    if(length(par.ignore.Rht) == 0) {
+      mxRht <- sumTab %>% pull(Rhat) %>% max(na.rm = T)
+      mn.neff <- sumTab %>% pull(n.eff) %>% min(na.rm = T)
+    } else {
+      ind.ignore <- c()
+      for(p in 1:length(par.ignore.Rht)) ind.ignore <-
+          c(ind.ignore, str_detect(sumTab$Parameter, par.ignore.Rht[p])) %>%
+          unique()
+      mxRht <- sumTab %>% slice(-ind.ignore) %>% pull(Rhat) %>% max(na.rm = T)
+      mn.neff <- sumTab %>% slice(-ind.ignore) %>% pull(n.eff) %>% min(na.rm = T)
+    }
+    
     mod <- list(mcmcOutput = mod, summary = sumTab)
     if(sav.model) R.utils::saveObject(mod, mod.nam) # If running all in one.
     
@@ -75,6 +85,12 @@ RunNimbleParallel <-
         return(as.mcmc(as.matrix(CmodelMCMC$mvSamples)))
         gc(verbose = F)
       })
+      for(chn in 1:nc) { # nc must be > 1
+        ind.keep <- c()
+        for(p in 1:length(parameters)) ind.keep <-
+            c(ind.keep, which(str_detect(dimnames(out2[[chn]])[[2]], parameters[p]))) %>% unique()
+        out2[[chn]] <- out2[[chn]][,ind.keep]
+      }
       R.utils::saveObject(out2, str_c(mod.nam, "_chunk", n.runs)) # Save samples from previous run to drive.
       
       ni2 <- round(((ni / nt) * n.runs * nc) * nb) # Anticipated number of samples to save (assuming half discarded as burn-in).
@@ -113,7 +129,13 @@ RunNimbleParallel <-
         as_tibble() %>%
         mutate(Parameter = row.names(sumTab)) %>%
         select(Parameter, mean:f)
-      mxRht <- sumTab %>% slice(ind.Rht) %>% pull(Rhat) %>% max(na.rm = T)
+      if(length(par.ignore.Rht) == 0) {
+        mxRht <- sumTab  %>% pull(Rhat) %>% max(na.rm = T)
+        mn.neff <- sumTab %>% pull(n.eff) %>% min(na.rm = T)
+      } else {
+        mxRht <- sumTab %>% slice(-ind.ignore) %>% pull(Rhat) %>% max(na.rm = T)
+        mn.neff <- sumTab %>% slice(-ind.ignore) %>% pull(n.eff) %>% min(na.rm = T)
+      }
       gc(verbose = F)
       
       mod <- list(mcmcOutput = mod, summary = sumTab)
@@ -123,4 +145,3 @@ RunNimbleParallel <-
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
     if(rtrn.model) return(mod)
   }
-  
