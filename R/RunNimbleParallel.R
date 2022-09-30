@@ -141,7 +141,7 @@ RunNimbleParallel <-
       mod <- list(mcmcOutput = mod, summary = sumTab)
       if(sav.model) R.utils::saveObject(mod, mod.nam) # If running all in one.
     }
-    for(r in 1:n.runs) file.remove(str_c(mod.nam, "_chunk", r))
+    if(exists("n.run")) for(r in 1:n.runs) file.remove(str_c(mod.nam, "_chunk", r))
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
     if(rtrn.model) return(mod)
   }
