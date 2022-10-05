@@ -77,7 +77,7 @@ RunNimbleParallel <-
     }
     while(round(mxRht, digits = 1) > Rht.required | mn.neff < neff.required) {
       n.runs <- n.runs + 1
-      print(str_c("Run = ", n.runs, ". Max Rhat = ", round(mxRht, digits = 1), " and min neff = ", mn.neff,
+      print(str_c("Run = ", n.runs, ". Max Rhat = ", mxRht, " and min neff = ", mn.neff,
                   ". Keep on chugging."))
       
       out2 <- clusterEvalQ(cl, {
