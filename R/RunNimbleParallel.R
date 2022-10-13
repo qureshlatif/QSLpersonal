@@ -61,7 +61,7 @@ RunNimbleParallel <-
     } else {
       ind.ignore <- c()
       for(p in 1:length(par.ignore.Rht)) ind.ignore <-
-          c(ind.ignore, str_detect(sumTab$Parameter, par.ignore.Rht[p])) %>%
+          c(ind.ignore, which(str_detect(sumTab$Parameter, par.ignore.Rht[p]))) %>%
           unique()
       mxRht <- sumTab %>% slice(-ind.ignore) %>% pull(Rhat) %>% max(na.rm = T)
       mn.neff <- sumTab %>% slice(-ind.ignore) %>% pull(n.eff) %>% min(na.rm = T)
