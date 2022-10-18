@@ -5,7 +5,6 @@ RunNimbleParallel <-
            Rht.required = 1.1, neff.required = 100) {
     if((ni * nb) < 100) stop("Increase iterations (ni). Too few samples for calculating Rhat.")
     
-    #~~~~~Parallel processing code (probably won't work in Windows)~~~~~#
     require(nimble)
     require(parallel)
     require(coda)
@@ -141,7 +140,6 @@ RunNimbleParallel <-
       mod <- list(mcmcOutput = mod, summary = sumTab)
       if(sav.model) R.utils::saveObject(mod, mod.nam) # If running all in one.
     }
-    if(exists("n.run")) for(r in 1:n.runs) file.remove(str_c(mod.nam, "_chunk", r))
-    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
+    if(exists("n.runs")) for(r in 1:n.runs) file.remove(str_c(mod.nam, "_chunk", r))
     if(rtrn.model) return(mod)
   }
