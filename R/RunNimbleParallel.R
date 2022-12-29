@@ -62,8 +62,13 @@ RunNimbleParallel <-
       for(p in 1:length(par.ignore.Rht)) ind.ignore <-
           c(ind.ignore, which(str_detect(sumTab$Parameter, par.ignore.Rht[p]))) %>%
           unique()
-      mxRht <- sumTab %>% slice(-ind.ignore) %>% pull(Rhat) %>% max(na.rm = T)
-      mn.neff <- sumTab %>% slice(-ind.ignore) %>% pull(n.eff) %>% min(na.rm = T)
+      if(length(ind.ignore) > 0) {
+        mxRht <- sumTab %>% slice(-ind.ignore) %>% pull(Rhat) %>% max(na.rm = T)
+        mn.neff <- sumTab %>% slice(-ind.ignore) %>% pull(n.eff) %>% min(na.rm = T)
+      } else {
+        mxRht <- sumTab %>% pull(Rhat) %>% max(na.rm = T)
+        mn.neff <- sumTab %>% pull(n.eff) %>% min(na.rm = T)
+      }
     }
     
     mod <- list(mcmcOutput = mod, summary = sumTab)
@@ -132,8 +137,13 @@ RunNimbleParallel <-
         mxRht <- sumTab  %>% pull(Rhat) %>% max(na.rm = T)
         mn.neff <- sumTab %>% pull(n.eff) %>% min(na.rm = T)
       } else {
-        mxRht <- sumTab %>% slice(-ind.ignore) %>% pull(Rhat) %>% max(na.rm = T)
-        mn.neff <- sumTab %>% slice(-ind.ignore) %>% pull(n.eff) %>% min(na.rm = T)
+        if(length(ind.ignore) > 0) {
+          mxRht <- sumTab %>% slice(-ind.ignore) %>% pull(Rhat) %>% max(na.rm = T)
+          mn.neff <- sumTab %>% slice(-ind.ignore) %>% pull(n.eff) %>% min(na.rm = T)
+        } else {
+          mxRht <- sumTab %>% pull(Rhat) %>% max(na.rm = T)
+          mn.neff <- sumTab %>% pull(n.eff) %>% min(na.rm = T)
+        }
       }
       gc(verbose = F)
       
