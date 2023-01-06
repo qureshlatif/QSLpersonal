@@ -71,7 +71,8 @@ RunNimbleParallel <-
       }
     }
     
-    mod <- list(mcmcOutput = mod, summary = sumTab)
+    mcmc.info <- c(nchains = nc, niterations = ni, burnin = round(nb * ni), nthin = nt)
+    mod <- list(mcmcOutput = mod, summary = sumTab, mcmc.info = mcmc.info)
     if(sav.model) R.utils::saveObject(mod, mod.nam) # If running all in one.
     
     ## If has not converged, continue sampling
@@ -97,7 +98,7 @@ RunNimbleParallel <-
       }
       R.utils::saveObject(out2, str_c(mod.nam, "_chunk", n.runs)) # Save samples from previous run to drive.
       
-      ni2 <- round(((ni / nt) * n.runs * nc) * nb) # Anticipated number of samples to save (assuming half discarded as burn-in).
+      ni2 <- round(((ni / nt) * n.runs * nc) * (1 - nb)) # Anticipated number of samples to save (assuming half discarded as burn-in).
       if(ni2 > max.samples.saved) {
         nt2 <- round(1 / (max.samples.saved / ni2)) # Set additional thinning so that saved iterations don't exceed (by too much) max.samples.saved (specified by user).
       } else {
@@ -147,7 +148,8 @@ RunNimbleParallel <-
       }
       gc(verbose = F)
       
-      mod <- list(mcmcOutput = mod, summary = sumTab)
+      mcmc.info <- c(nchains = nc, niterations = ni * n.runs, burnin = round(nb * ni), nthin = nt * nt2)
+      mod <- list(mcmcOutput = mod, summary = sumTab, mcmc.info = mcmc.info)
       if(sav.model) R.utils::saveObject(mod, mod.nam) # If running all in one.
     }
     if(exists("n.runs")) for(r in 1:n.runs) file.remove(str_c(mod.nam, "_chunk", r))
