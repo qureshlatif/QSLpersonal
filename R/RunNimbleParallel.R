@@ -148,7 +148,7 @@ RunNimbleParallel <-
       }
       gc(verbose = F)
       
-      mcmc.info <- c(nchains = nc, niterations = ni * n.runs, burnin = round(nb * ni), nthin = nt * nt2)
+      mcmc.info <- c(nchains = nc, niterations = ni * n.runs, burnin = round(nb * ni * n.runs), nthin = nt * nt2)
       mod <- list(mcmcOutput = mod, summary = sumTab, mcmc.info = mcmc.info)
       if(sav.model) R.utils::saveObject(mod, mod.nam) # If running all in one.
     }
