@@ -3,7 +3,8 @@ RunNimbleParallel <-
            nc = 2, ni = 2000, nb = 0.5, nt = 10, mod.nam = "mod",
            max.samples.saved = 10000, rtrn.model = F, sav.model = T,
            Rht.required = 1.1, neff.required = 100) {
-    if((ni * nb) < 100) stop("Increase iterations (ni). Too few samples for calculating Rhat.")
+    if(nb < 1 & (ni * nb) < 100) stop("Increase iterations (ni) or reduce burn-in. Too few samples for calculating Rhat.")
+    if(nb >= 1 & nb < 100) stop("Increase iterations (ni) or reduce burn-in. Too few samples for calculating Rhat.")
     
     require(nimble)
     require(parallel)
@@ -26,6 +27,10 @@ RunNimbleParallel <-
                            inits = init)
       Cmodel <- compileNimble(model)
       modelConf <- configureMCMC(model, thin = nt)
+      # modelConf$removeSamplers(c("beta0", "betaVec", "delta0", "dev.delta0", "deltaVec"))
+      # modelConf$addSampler(c("beta0", "betaVec"), type = "RW_block", control = list(tries = 10))
+      # modelConf$addSampler(c("delta0", "deltaVec"), type = "RW_block", control = list(tries = 10))
+      # modelConf$addSampler(c("dev.delta0"), type = "RW_block", control = list(tries = 10))
       modelConf$addMonitors(parameters)
       modelMCMC <- buildMCMC(modelConf)
       CmodelMCMC <- compileNimble(modelMCMC, project = model)
@@ -43,7 +48,13 @@ RunNimbleParallel <-
     out2 <- out1
     ni.saved <- nrow(out2[[1]])
     for(chn in 1:nc) { # nc must be > 1
-      out2[[chn]] <- out2[[chn]][(round(ni.saved * nb)+1):ni.saved,]
+      
+      if(nb < 1) {
+        nb.real <- (round(ni.saved * nb)+1)
+      } else {
+        nb.real <- (round(nb/nt)+1)
+      }
+      out2[[chn]] <- out2[[chn]][nb.real:ni.saved,]
     }
     out.mcmc <- coda::as.mcmc.list(lapply(out2, coda::as.mcmc))
     
@@ -71,7 +82,8 @@ RunNimbleParallel <-
       }
     }
     
-    mcmc.info <- c(nchains = nc, niterations = ni, burnin = round(nb * ni), nthin = nt)
+    mcmc.info <- c(nchains = nc, niterations = ni,
+                   burnin = nb.real, nthin = nt)
     mod <- list(mcmcOutput = mod, summary = sumTab, mcmc.info = mcmc.info)
     if(sav.model) R.utils::saveObject(mod, mod.nam) # If running all in one.
     
@@ -98,7 +110,11 @@ RunNimbleParallel <-
       }
       R.utils::saveObject(out2, str_c(mod.nam, "_chunk", n.runs)) # Save samples from previous run to drive.
       
-      ni2 <- round(((ni / nt) * n.runs * nc) * (1 - nb)) # Anticipated number of samples to save (assuming half discarded as burn-in).
+      if(nb < 1) {  # Anticipated number of samples to save (assuming half discarded as burn-in).
+        ni2 <- round(((ni / nt) * n.runs * nc) * (1 - nb))
+      } else {
+        ni2 <- round(((ni / nt) * n.runs * nc) - (nb / nt * nc))
+      }
       if(ni2 > max.samples.saved) {
         nt2 <- round(1 / (max.samples.saved / ni2)) # Set additional thinning so that saved iterations don't exceed (by too much) max.samples.saved (specified by user).
       } else {
@@ -124,7 +140,12 @@ RunNimbleParallel <-
       out3 <- out1
       ni.saved <- nrow(out3[[1]])
       for(chn in 1:nc) {
-        out3[[chn]] <- out3[[chn]][(round(ni.saved/2)+1):ni.saved,]
+        if(nb < 1) {
+          nb.real <- (round(ni.saved * nb)+1)
+        } else {
+          nb.real <- round((nb / nt)+1)
+        }
+        out3[[chn]] <- out3[[chn]][nb.real:ni.saved,]
       }
       out.mcmc.update <- coda::as.mcmc.list(lapply(out3, coda::as.mcmc))
       
@@ -148,7 +169,7 @@ RunNimbleParallel <-
       }
       gc(verbose = F)
       
-      mcmc.info <- c(nchains = nc, niterations = ni * n.runs, burnin = round(nb * ni * n.runs), nthin = nt * nt2)
+      mcmc.info <- c(nchains = nc, niterations = ni * n.runs, burnin = nb.real, nthin = nt * nt2)
       mod <- list(mcmcOutput = mod, summary = sumTab, mcmc.info = mcmc.info)
       if(sav.model) R.utils::saveObject(mod, mod.nam) # If running all in one.
     }

@@ -23,7 +23,7 @@
   \item{par.ignore.Rht}{String vector listing parameters to be ignored when calculating convergence and sampling metrics. All parameters with names containing strings listed here will be ignored. Default is an empty vector, whereby all parameters will be considered for calculating Rhat.}
   \item{nc}{Number of MCMC chains to run. Note available cores must equal or exceed 'nc'. Default = 2.}
   \item{ni}{Number of iterations to run MCMC chains before checking convergence and sampling metrics. Default = 10000. If model does not meet specified levels for R_hat and n_effective, sampling will continue for another 'ni' steps before checking metrics again.}
-  \item{nb}{Proportion of MCMC chains to discard as burn-in.}
+  \item{nb}{If < 1, proportion of MCMC chains to discard as burn-in. If > 1, chain length before thinning to discard as burn-in.}
   \item{nt}{Base level of thinning to implement within parallelized cluster. Default = 10. Setting this argument will reduce load on RAM for large models.}
   \item{mod.nam}{Character string used as a file label for saved model outputs.}
   \item{max.samples.saved}{Integer that sets minimum level of samples to save per MCMC chain in final model object. Additional thinning of posterior samples (i.e., after samples are recovered from processing clusters) is implemented as necessary to limit the size of the model object to (roughly) this level. Default = 10000.}
