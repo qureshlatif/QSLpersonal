@@ -27,6 +27,7 @@ RunNimbleParallel <-
                            inits = init)
       Cmodel <- compileNimble(model)
       modelConf <- configureMCMC(model, thin = nt)
+      # Example code for switching out samplers:
       # modelConf$removeSamplers(c("beta0", "betaVec", "delta0", "dev.delta0", "deltaVec"))
       # modelConf$addSampler(c("beta0", "betaVec"), type = "RW_block", control = list(tries = 10))
       # modelConf$addSampler(c("delta0", "deltaVec"), type = "RW_block", control = list(tries = 10))
@@ -83,7 +84,7 @@ RunNimbleParallel <-
     }
     
     mcmc.info <- c(nchains = nc, niterations = ni,
-                   burnin = nb.real, nthin = nt)
+                   burnin = ifelse(nb<1, nb*ni, nb), nthin = nt)
     mod <- list(mcmcOutput = mod, summary = sumTab, mcmc.info = mcmc.info)
     if(sav.model) R.utils::saveObject(mod, mod.nam) # If running all in one.
     
@@ -169,7 +170,9 @@ RunNimbleParallel <-
       }
       gc(verbose = F)
       
-      mcmc.info <- c(nchains = nc, niterations = ni * n.runs, burnin = nb.real, nthin = nt * nt2)
+      mcmc.info <- c(nchains = nc, niterations = ni * n.runs,
+                     burnin = ifelse(nb<1, round(ni.saved * nb), nb),
+                     nthin = nt * nt2)
       mod <- list(mcmcOutput = mod, summary = sumTab, mcmc.info = mcmc.info)
       if(sav.model) R.utils::saveObject(mod, mod.nam) # If running all in one.
     }
