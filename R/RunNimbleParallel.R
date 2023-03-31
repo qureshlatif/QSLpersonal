@@ -3,8 +3,8 @@ RunNimbleParallel <-
            nc = 2, ni = 2000, nb = 0.5, nt = 10, mod.nam = "mod",
            max.samples.saved = 10000, rtrn.model = F, sav.model = T,
            Rht.required = 1.1, neff.required = 100) {
-    if(nb < 1 & (ni * nb) < 100) stop("Increase iterations (ni) or reduce burn-in. Too few samples for calculating Rhat.")
-    if(nb >= 1 & nb < 100) stop("Increase iterations (ni) or reduce burn-in. Too few samples for calculating Rhat.")
+    if(nb < 1 & (ni - (ni * nb)) < 100) stop("Increase iterations (ni) or reduce burn-in. Too few samples for calculating Rhat.")
+    if(nb >= 1 & (ni - nb) < 100) stop("Increase iterations (ni) or reduce burn-in. Too few samples for calculating Rhat.")
     
     require(nimble)
     require(parallel)
