@@ -144,7 +144,7 @@ RunNimbleParallel <-
         if(nb < 1) {
           nb.real <- (round(ni.saved * nb)+1)
         } else {
-          nb.real <- round((nb / nt)+1)
+          nb.real <- round((nb / (nt * nt2))+1)
         }
         out3[[chn]] <- out3[[chn]][nb.real:ni.saved,]
       }
