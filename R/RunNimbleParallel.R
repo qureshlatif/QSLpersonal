@@ -32,7 +32,7 @@ RunNimbleParallel <-
       # modelConf$addSampler(c("beta0", "betaVec"), type = "RW_block", control = list(tries = 10))
       # modelConf$addSampler(c("delta0", "deltaVec"), type = "RW_block", control = list(tries = 10))
       # modelConf$addSampler(c("dev.delta0"), type = "RW_block", control = list(tries = 10))
-      modelConf$addMonitors(parameters)
+      modelConf$setMonitors(parameters)
       modelMCMC <- buildMCMC(modelConf)
       CmodelMCMC <- compileNimble(modelMCMC, project = model)
       CmodelMCMC$run(ni, reset = FALSE)
